@@ -7,11 +7,11 @@ describe 'Courses API' do
 
       teacher.courses.create!(name:'Ingles do Zero',
                               description:'Aprendendo Ingles do Zero',
-                              time:'20 horas', code: '9d04efe4dc40e059c4c9')
+                              time:'20 horas')
 
       teacher.courses.create!(name:'Ingles avancado',
                               description:'Aprendendo Ingles avancado',
-                              time:'40 horas', code: '9d04efe4dc50e059c4c9')
+                              time:'40 horas')
 
       get '/api/v1/courses'
 
@@ -50,11 +50,11 @@ describe 'Courses API' do
 
       course = teacher.courses.create!(name:'Ingles do Zero',
                                        description:'Aprendendo Ingles do Zero',
-                                       time:'20 horas', code: '9d04efe4dc40e059c4c9')
+                                       time:'20 horas')
 
       teacher.courses.create!(name:'Ingles avancado',
                               description:'Aprendendo Ingles avancado',
-                              time:'40 horas', code: '9d04eke4yc40e059c4c9')
+                              time:'40 horas')
 
       get "/api/v1/courses/#{course.id}"
 
@@ -125,21 +125,22 @@ describe 'Courses API' do
       expect(course.code).to be_present
     end
 
-    xit 'if repeat random code' do
+    it 'if repeat random code' do
       teacher = Teacher.create!(name:'Jose', age:'33', subject:'Ingles')
 
-      course_stub = teacher.courses.create!(name:'Ingles do Zero',
-                                            description:'Aprendendo Ingles do Zero',
-                                            time:'20 horas', code: '11111111111111111111')
-
       course = teacher.courses.create!(name:'Ingles do Zero',
-                                       description:'Aprendendo Ingles do Zero',
-                                       time:'20 horas', code: '9d04efe4dc40e059c4c9')
+                                      description:'Aprendendo Ingles do Zero',
+                                      time:'20 horas')
 
+      course_stub = teacher.courses.new(name:'Ingles do Zero',
+                                          description:'Aprendendo Ingles do Zero',
+                                          time:'20 horas')
+      allow(Digest::SHA256).to receive(:hexdigest).and_return(course.code, '11111111111111111111')
+      course_stub.save!
 
-
-      allow(Digest).to receive(course.code).and_return(course_stub.code)
-      expect(course.code).to eq(course_stub.code)
+      expect(course.code).to_not eq(course_stub.code)
+      expect(course_stub.code).to eq('11111111111111111111')
     end
   end
 end
+

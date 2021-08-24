@@ -19,8 +19,6 @@ class Api::V1::CoursesController <  ActionController::API
 
   def create
     @course = Course.new(course_params)
-    @course.create_code
-
     if @course.save
       render json: @course.as_json(except: [:id, :created_at, :updated_at, :teacher_id],
                                  include: :teacher), status: :created
